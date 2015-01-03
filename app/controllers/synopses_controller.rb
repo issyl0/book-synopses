@@ -9,7 +9,7 @@ class SynopsesController < UIViewController
                                       forState: UIControlStateNormal)
     search_button.frame = [[100,100],[100,100]]
     search_button.addTarget(self,
-                            action:           'search',
+                            action:           'search_and_show',
                             forControlEvents: UIControlEventTouchUpInside)
     self.view.addSubview(search_button)
 
@@ -21,6 +21,11 @@ class SynopsesController < UIViewController
     self.view.addSubview(search_textfield)
   end
 
-  def search
+  def search_and_show
+    BW::HTTP.get("#{AppDelegate.api_root}&title=#{@search_query.text}") do |results|
+      reviews_iframe = BW::JSON.parse(results.body)['reviews_widget']
+      book_url = Wakizashi::HTML(reviews_iframe).xpath("//a").first['href']
+    end
   end
+
 end
