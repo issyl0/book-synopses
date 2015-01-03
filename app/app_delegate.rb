@@ -1,15 +1,8 @@
 class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
-    rootViewController = UIViewController.alloc.init
-    rootViewController.title = 'book-synopses'
-    rootViewController.view.backgroundColor = UIColor.whiteColor
-
-    navigationController = UINavigationController.alloc.initWithRootViewController(rootViewController)
-
     @window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
-    @window.rootViewController = navigationController
+    controller = SynopsesController.alloc.initWithNibName(nil, bundle:nil)
+    @window.rootViewController = UINavigationController.alloc.initWithRootViewController(controller)
     @window.makeKeyAndVisible
-
-    true
   end
 end
