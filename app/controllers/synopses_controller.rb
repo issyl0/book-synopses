@@ -30,12 +30,23 @@ class SynopsesController < UIViewController
 
   def search_and_show
     BW::HTTP.get("#{AppDelegate.api_root}&title=#{@search_query.text}") do |results|
-      reviews_iframe = BW::JSON.parse(results.body)['reviews_widget']
-      book_url = Wakizashi::HTML(reviews_iframe).xpath("//a").first['href']
 
-      BW::HTTP.get(book_url) do |synopsis|
-        @synopsis_label.text = Wakizashi::HTML(synopsis.body).xpath("//div[@id='description']/span[2]").first.to_s
-        self.view.addSubview(@synopsis_label)
+      if results.ok?
+        reviews_iframe = BW::JSON.parse(results.body)['reviews_widget']
+        book_url = Wakizashi::HTML(reviews_iframe).xpath("//a").first['href']
+
+        BW::HTTP.get(book_url) do |synopsis|
+          @synopsis_textview.text = Wakizashi::HTML(synopsis.body).xpath("//div[@id='description']/span[2]").first.to_s
+          @synopsis_textview.sizeToFit
+
+          if !@synopsis_textview.text.nil?
+            self.view.addSubview(@synopsis_textview)
+          else
+            App.alert("Could not find a synopsis for #{@search_query.text} on Goodreads. Search again?")
+          end
+        end
+      else
+        App.alert("Could not find the book #{@search_query.text} on Goodreads. Search again?")
       end
     end
   end
