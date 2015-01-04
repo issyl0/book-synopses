@@ -21,6 +21,15 @@ class SynopsesController < UIViewController
     @search_query = search_textfield
     self.view.addSubview(search_textfield)
 
+    # Book URL textview.
+    book_url_textview = UITextView.alloc.initWithFrame([[16,175],[288,21]])
+    book_url_textview.textColor = UIColor.blackColor
+    book_url_textview.editable = false
+    book_url_textview.textAlignment = NSTextAlignmentCenter
+    book_url_textview.dataDetectorTypes = UIDataDetectorTypeLink
+    book_url_textview.font = UIFont.systemFontOfSize(8.0)
+    @book_url_textview = book_url_textview
+
     # Synopsis container.
     synopsis_textview = UITextView.alloc.initWithFrame([[16,199],[288,274]])
     synopsis_textview.textColor = UIColor.blackColor
@@ -34,6 +43,9 @@ class SynopsesController < UIViewController
       if results.ok?
         reviews_iframe = BW::JSON.parse(results.body)['reviews_widget']
         book_url = Wakizashi::HTML(reviews_iframe).xpath("//a").first['href']
+
+        @book_url_textview.text = book_url
+        self.view.addSubview(@book_url_textview)
 
         BW::HTTP.get(book_url) do |synopsis|
           @synopsis_textview.text = Wakizashi::HTML(synopsis.body).xpath("//div[@id='description']/span[2]").first.to_s
